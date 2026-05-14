@@ -11,12 +11,12 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-// Serve static files from the current directory (root)
-app.use(express.static('.'));
+// Serve static files from the current working directory (root)
+app.use(express.static(process.cwd()));
 
-// Root route to serve index.html (Fixes "Cannot GET /" on Vercel)
+// Root route to serve index.html
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
+    res.sendFile(path.join(process.cwd(), 'index.html'));
 });
 
 // ─── FIREBASE INITIALIZATION ───
