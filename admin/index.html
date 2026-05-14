@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard — Easy Workflow</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" type="image/x-icon" href="../favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+    <!-- ==================== LOGIN SCREEN ==================== -->
+    <div id="login-screen" class="login-screen">
+        <div class="login-bg">
+            <div class="login-glow login-glow-1"></div>
+            <div class="login-glow login-glow-2"></div>
+        </div>
+        <div class="login-card">
+            <div class="login-header">
+                <div class="login-logo">
+                    <span class="login-logo-icon">⚡</span>
+                    <span class="login-logo-text">Easy Workflow</span>
+                </div>
+                <h1>Admin Dashboard</h1>
+                <p>Sign in to manage your products, pricing, and customers.</p>
+            </div>
+            <form id="login-form" autocomplete="on">
+                <div class="form-group">
+                    <label for="login-email">Email</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-envelope"></i>
+                        <input type="email" id="login-email" placeholder="admin@easyworkflow.store" required autocomplete="email">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-lock"></i>
+                        <input type="password" id="login-password" placeholder="••••••••" required autocomplete="current-password">
+                    </div>
+                </div>
+                <div id="login-error" class="login-error" style="display:none;"></div>
+                <button type="submit" class="login-btn" id="login-btn">
+                    <span id="login-btn-text">Sign In</span>
+                    <span id="login-btn-loader" style="display:none;">
+                        <i class="fa-solid fa-spinner fa-spin"></i>
+                    </span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==================== DASHBOARD ==================== -->
+    <div id="dashboard" class="dashboard" style="display:none;">
+        <!-- SIDEBAR -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <span class="sidebar-logo-icon">⚡</span>
+                <span class="sidebar-logo-text">EW Admin</span>
+                <button class="sidebar-close" id="sidebar-close"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" data-page="overview">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <span>Overview</span>
+                </a>
+                <a href="#" class="nav-item" data-page="leads">
+                    <i class="fa-solid fa-users"></i>
+                    <span>Leads & Customers</span>
+                    <span class="nav-badge" id="leads-count-badge">0</span>
+                </a>
+                <a href="#" class="nav-item" data-page="pricing">
+                    <i class="fa-solid fa-tags"></i>
+                    <span>Pricing</span>
+                </a>
+                <a href="#" class="nav-item" data-page="coupons">
+                    <i class="fa-solid fa-ticket"></i>
+                    <span>Promo Codes</span>
+                </a>
+                <a href="#" class="nav-item" data-page="licenses">
+                    <i class="fa-solid fa-key"></i>
+                    <span>Licenses</span>
+                    <span class="nav-badge" id="licenses-count-badge">0</span>
+                </a>
+                <a href="#" class="nav-item" data-page="payments">
+                    <i class="fa-solid fa-credit-card"></i>
+                    <span>Payments</span>
+                </a>
+                <a href="#" class="nav-item" data-page="settings">
+                    <i class="fa-solid fa-gear"></i>
+                    <span>Site Settings</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="sidebar-user">
+                    <div class="user-avatar"><i class="fa-solid fa-user"></i></div>
+                    <div class="user-info">
+                        <span class="user-name" id="admin-name">Admin</span>
+                        <span class="user-email" id="admin-email">admin@ew.store</span>
+                    </div>
+                </div>
+                <button class="logout-btn" id="logout-btn">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+            <!-- Top Bar -->
+            <header class="topbar">
+                <button class="hamburger-admin" id="hamburger-admin">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <h2 class="page-title" id="page-title">Overview</h2>
+                <div class="topbar-actions">
+                    <a href="/" class="topbar-link" target="_blank"><i class="fa-solid fa-globe"></i> View Site</a>
+                </div>
+            </header>
+
+            <!-- ==================== PAGE: OVERVIEW ==================== -->
+            <div class="page active" id="page-overview">
+                <div class="stats-grid">
+                    <div class="stat-card stat-purple">
+                        <div class="stat-card-icon"><i class="fa-solid fa-users"></i></div>
+                        <div class="stat-card-content">
+                            <span class="stat-card-value" id="stat-total-leads">0</span>
+                            <span class="stat-card-label">Total Leads</span>
+                        </div>
+                    </div>
+                    <div class="stat-card stat-green">
+                        <div class="stat-card-icon"><i class="fa-solid fa-check-circle"></i></div>
+                        <div class="stat-card-content">
+                            <span class="stat-card-value" id="stat-paid">0</span>
+                            <span class="stat-card-label">Conversion Rate</span>
+                        </div>
+                    </div>
+                    <div class="stat-card stat-blue">
+                        <div class="stat-card-icon"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+                        <div class="stat-card-content">
+                            <span class="stat-card-value" id="stat-revenue">₹0</span>
+                            <span class="stat-card-label">Total Revenue</span>
+                        </div>
+                    </div>
+                    <div class="stat-card stat-orange">
+                        <div class="stat-card-icon"><i class="fa-solid fa-clock"></i></div>
+                        <div class="stat-card-content">
+                            <span class="stat-card-value" id="stat-pending">0</span>
+                            <span class="stat-card-label">Pending Leads</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analytics Chart & Recent Activity -->
+                <div class="dashboard-grid-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fa-solid fa-chart-area"></i> Revenue & Leads Trend</h3>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="analyticsChart" height="250"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fa-solid fa-clock-rotate-left"></i> Recent Activity</h3>
+                        </div>
+                        <div class="card-body">
+                            <div id="recent-activity" class="activity-list">
+                                <div class="empty-state">
+                                    <i class="fa-solid fa-inbox"></i>
+                                    <p>No activity yet. Leads will appear here in real-time.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== PAGE: LEADS ==================== -->
+            <div class="page" id="page-leads">
+                <div class="page-actions">
+                    <div class="search-bar">
+                        <i class="fa-solid fa-search"></i>
+                        <input type="text" id="leads-search" placeholder="Search by name, email, or phone...">
+                    </div>
+                    <div class="filter-group">
+                        <select id="leads-filter">
+                            <option value="all">All Status</option>
+                            <option value="interested">Interested</option>
+                            <option value="paid">Paid</option>
+                            <option value="verified">Verified</option>
+                        </select>
+                        <select id="leads-tier-filter">
+                            <option value="all">All Products</option>
+                            <option value="basic">Basic</option>
+                            <option value="pro">Pro</option>
+                            <option value="autocaptions">Auto Captions</option>
+                        </select>
+                        <button class="btn-export" id="export-leads-btn">
+                            <i class="fa-solid fa-download"></i> Export CSV
+                        </button>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body table-responsive">
+                        <table class="data-table" id="leads-table">
+                            <thead>
+                                <tr>
+                                    <th>Customer</th>
+                                    <th>Phone</th>
+                                    <th>Product</th>
+                                    <th>Status</th>
+                                    <th>Gateway</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leads-tbody">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                        <div id="leads-empty" class="empty-state" style="display:none;">
+                            <i class="fa-solid fa-user-slash"></i>
+                            <p>No leads found.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== PAGE: PRICING ==================== -->
+            <div class="page" id="page-pricing">
+                <div class="pricing-grid">
+                    <!-- Basic -->
+                    <div class="pricing-edit-card">
+                        <div class="pricing-edit-header">
+                            <div class="pricing-edit-icon" style="background:rgba(59,130,246,0.15);color:#3b82f6;">
+                                <i class="fa-solid fa-cube"></i>
+                            </div>
+                            <div>
+                                <h3>Easy Workflow Basic</h3>
+                                <p class="pricing-edit-desc">Core workflow tools</p>
+                            </div>
+                        </div>
+                        <div class="pricing-edit-body">
+                            <div class="price-input-group">
+                                <label>Price (INR)</label>
+                                <div class="price-input-wrapper">
+                                    <span class="price-symbol">₹</span>
+                                    <input type="number" id="price-basic-inr" class="price-input" value="100" min="0">
+                                </div>
+                            </div>
+                            <div class="price-input-group">
+                                <label>Price (USD)</label>
+                                <div class="price-input-wrapper">
+                                    <span class="price-symbol">$</span>
+                                    <input type="number" id="price-basic-usd" class="price-input" value="2" min="0">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pro -->
+                    <div class="pricing-edit-card featured">
+                        <div class="pricing-edit-header">
+                            <div class="pricing-edit-icon" style="background:rgba(124,58,237,0.15);color:#7c3aed;">
+                                <i class="fa-solid fa-bolt"></i>
+                            </div>
+                            <div>
+                                <h3>Easy Workflow Pro</h3>
+                                <p class="pricing-edit-desc">All 7 tools unlocked</p>
+                            </div>
+                            <span class="pricing-card-badge">POPULAR</span>
+                        </div>
+                        <div class="pricing-edit-body">
+                            <div class="price-input-group">
+                                <label>Price (INR)</label>
+                                <div class="price-input-wrapper">
+                                    <span class="price-symbol">₹</span>
+                                    <input type="number" id="price-pro-inr" class="price-input" value="1500" min="0">
+                                </div>
+                            </div>
+                            <div class="price-input-group">
+                                <label>Price (USD)</label>
+                                <div class="price-input-wrapper">
+                                    <span class="price-symbol">$</span>
+                                    <input type="number" id="price-pro-usd" class="price-input" value="18" min="0">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Auto Captions -->
+                    <div class="pricing-edit-card">
+                        <div class="pricing-edit-header">
+                            <div class="pricing-edit-icon" style="background:rgba(34,197,94,0.15);color:#22c55e;">
+                                <i class="fa-solid fa-microphone"></i>
+                            </div>
+                            <div>
+                                <h3>Auto Captions Pro</h3>
+                                <p class="pricing-edit-desc">AI-powered subtitles</p>
+                            </div>
+                        </div>
+                        <div class="pricing-edit-body">
+                            <div class="price-input-group">
+                                <label>Price (INR)</label>
+                                <div class="price-input-wrapper">
+                                    <span class="price-symbol">₹</span>
+                                    <input type="number" id="price-autocaptions-inr" class="price-input" value="800" min="0">
+                                </div>
+                            </div>
+                            <div class="price-input-group">
+                                <label>Price (USD)</label>
+                                <div class="price-input-wrapper">
+                                    <span class="price-symbol">$</span>
+                                    <input type="number" id="price-autocaptions-usd" class="price-input" value="10" min="0">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pricing-actions">
+                    <button class="btn-save-pricing" id="save-pricing-btn">
+                        <i class="fa-solid fa-floppy-disk"></i> Save All Prices
+                    </button>
+                    <span class="pricing-save-note" id="pricing-save-status"></span>
+                </div>
+
+                <div class="card" style="margin-top:24px;">
+                    <div class="card-header">
+                        <h3><i class="fa-solid fa-circle-info"></i> How Pricing Works</h3>
+                    </div>
+                    <div class="card-body">
+                        <p style="color:var(--text-secondary);font-size:14px;line-height:1.8;">
+                            Prices saved here are stored in Firebase Firestore and <strong>automatically reflected on your main website</strong> in real-time.
+                            When a customer visits your site, it loads prices from Firestore. The payment amounts on both Cashfree and Razorpay
+                            orders are also validated server-side against these stored values.<br><br>
+                            <strong>INR prices</strong> are shown to Indian visitors. <strong>USD prices</strong> are shown to international visitors.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== PAGE: PAYMENTS ==================== -->
+            <div class="page" id="page-payments">
+                <div class="page-actions">
+                    <div class="search-bar">
+                        <i class="fa-solid fa-search"></i>
+                        <input type="text" id="payments-search" placeholder="Search by payment ID, name, or email...">
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body table-responsive">
+                        <table class="data-table" id="payments-table">
+                            <thead>
+                                <tr>
+                                    <th>Payment ID</th>
+                                    <th>Customer</th>
+                                    <th>Product</th>
+                                    <th>Amount</th>
+                                    <th>Gateway</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody id="payments-tbody">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                        <div id="payments-empty" class="empty-state" style="display:none;">
+                            <i class="fa-solid fa-receipt"></i>
+                            <p>No payments recorded yet.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== PAGE: LICENSES ==================== -->
+            <div class="page" id="page-licenses">
+                <div class="page-actions">
+                    <div class="search-bar">
+                        <i class="fa-solid fa-search"></i>
+                        <input type="text" id="licenses-search" placeholder="Search by email, key, or name...">
+                    </div>
+                    <div class="filter-group">
+                        <select id="licenses-product-filter">
+                            <option value="all">All Products</option>
+                            <option value="Basic">Basic</option>
+                            <option value="Pro">Pro</option>
+                            <option value="Auto Captions">Auto Captions</option>
+                            <option value="Project Manager">Project Manager</option>
+                        </select>
+                        <button class="btn-save-pricing" id="gen-license-btn">
+                            <i class="fa-solid fa-plus"></i> Manual License
+                        </button>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body table-responsive">
+                        <table class="data-table" id="licenses-table">
+                            <thead>
+                                <tr>
+                                    <th>License Key</th>
+                                    <th>Customer</th>
+                                    <th>Product</th>
+                                    <th>Activations</th>
+                                    <th>Status</th>
+                                    <th>Created</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="licenses-tbody">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                        <div id="licenses-empty" class="empty-state" style="display:none;">
+                            <i class="fa-solid fa-key"></i>
+                            <p>No licenses found.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== PAGE: COUPONS ==================== -->
+            <div class="page" id="page-coupons">
+                <div class="dashboard-grid-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fa-solid fa-ticket"></i> Active Promo Codes</h3>
+                        </div>
+                        <div class="card-body table-responsive">
+                            <table class="data-table" id="coupons-table">
+                                <thead>
+                                    <tr>
+                                        <th>Code</th>
+                                        <th>Discount %</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="coupons-tbody">
+                                    <!-- Populated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fa-solid fa-plus"></i> Create New Promo</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label style="display:block;margin-bottom:8px;font-size:12px;color:rgba(255,255,255,0.5);">PROMO CODE (e.g., DIWALI50)</label>
+                                <input type="text" id="new-coupon-code" class="price-input" style="background:#0d0d14;border:1px solid rgba(255,255,255,0.1);padding:10px;border-radius:6px;width:100%;margin-bottom:16px;font-size:16px;text-transform:uppercase;">
+                            </div>
+                            <div class="form-group">
+                                <label style="display:block;margin-bottom:8px;font-size:12px;color:rgba(255,255,255,0.5);">DISCOUNT PERCENTAGE (0-100)</label>
+                                <input type="number" id="new-coupon-discount" class="price-input" style="background:#0d0d14;border:1px solid rgba(255,255,255,0.1);padding:10px;border-radius:6px;width:100%;margin-bottom:20px;font-size:16px;" min="1" max="100">
+                            </div>
+                            <button class="btn-save-pricing" id="create-coupon-btn" style="width:100%;justify-content:center;">
+                                <i class="fa-solid fa-ticket"></i> Create Promo Code
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== PAGE: SETTINGS ==================== -->
+            <div class="page" id="page-settings">
+                <div class="card" style="max-width:600px;margin:0 auto;">
+                    <div class="card-header">
+                        <h3><i class="fa-solid fa-stopwatch"></i> Website Countdown & Banner</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group" style="margin-bottom:20px;">
+                            <label style="display:block;margin-bottom:8px;font-size:12px;color:rgba(255,255,255,0.5);">COUNTDOWN DEADLINE (Price Increase Date)</label>
+                            <input type="datetime-local" id="site-deadline-date" class="price-input" style="background:#0d0d14;border:1px solid rgba(255,255,255,0.1);padding:10px;border-radius:6px;width:100%;color:white;">
+                            <p style="font-size:12px;color:var(--text-muted);margin-top:6px;">If this date is in the past, the countdown banner disappears and "After Deadline" prices apply.</p>
+                        </div>
+                        
+                        <div class="form-group" style="margin-bottom:24px;">
+                            <label style="display:block;margin-bottom:8px;font-size:12px;color:rgba(255,255,255,0.5);">TOP BANNER ANNOUNCEMENT TEXT</label>
+                            <input type="text" id="site-banner-text" class="price-input" style="background:#0d0d14;border:1px solid rgba(255,255,255,0.1);padding:10px;border-radius:6px;width:100%;color:white;" placeholder="e.g., Use code EARLYBIRD for 20% off!">
+                        </div>
+
+                        <button class="btn-save-pricing" id="save-settings-btn" style="width:100%;justify-content:center;">
+                            <i class="fa-solid fa-floppy-disk"></i> Save Site Settings
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Lead Detail Modal -->
+    <div id="lead-modal" class="modal-overlay" style="display:none;">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 id="lead-modal-title">Lead Details</h3>
+                <button class="modal-close" id="lead-modal-close"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body" id="lead-modal-body">
+                <!-- Populated by JS -->
+            </div>
+            
+            <!-- Send License Email Section -->
+            <div id="license-composer" style="display:none; padding: 20px; border-top: 1px solid var(--border); background: rgba(59, 130, 246, 0.03);">
+                <h4 style="font-family: var(--font-heading); font-size: 14px; margin-bottom: 12px; color: var(--accent-blue); display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-paper-plane"></i> Send Manual License Email
+                </h4>
+                <div class="form-group">
+                    <label style="display:block; margin-bottom:6px; font-size:11px; color:var(--text-muted);">GUMROAD DISCOUNT LINK</label>
+                    <input type="text" id="manual-license-link" placeholder="https://gumroad.com/l/..." style="width:100%; padding:10px; background:var(--bg-input); border:1px solid var(--border); border-radius:6px; color:white; font-size:13px;">
+                </div>
+                <div class="form-group" style="margin-top:12px;">
+                    <label style="display:block; margin-bottom:6px; font-size:11px; color:var(--text-muted);">CUSTOM MESSAGE (OPTIONAL)</label>
+                    <textarea id="manual-license-message" rows="3" placeholder="I've verified your payment. Here is your access link!" style="width:100%; padding:10px; background:var(--bg-input); border:1px solid var(--border); border-radius:6px; color:white; font-size:13px; font-family:var(--font-body); resize:none;"></textarea>
+                </div>
+                <div style="display:flex; gap:10px; margin-top:16px;">
+                    <button class="modal-action-btn primary" id="send-license-btn" style="flex:1; justify-content:center;">
+                        <i class="fa-solid fa-paper-plane"></i> Send License Now
+                    </button>
+                    <button class="modal-action-btn" id="cancel-license-btn" style="background:transparent; border:1px solid var(--border);">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+
+            <div class="modal-footer" id="lead-modal-footer">
+                <!-- Action buttons populated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Firebase SDK (v10 Compat for simplicity) -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+    <script src="admin.js"></script>
+</body>
+</html>
