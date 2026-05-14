@@ -32,6 +32,18 @@ function signKey(licenseKey, email) {
     return crypto.createHmac('sha256', secret).update(`${licenseKey}:${email.toLowerCase().trim()}`).digest('hex');
 }
 
+// HELPER: Parse JSON Body
+async function getBody(req) {
+    return new Promise((resolve) => {
+        let body = '';
+        req.on('data', chunk => { body += chunk.toString(); });
+        req.on('end', () => {
+            try { resolve(JSON.parse(body)); }
+            catch (e) { resolve({}); }
+        });
+    });
+}
+
 // ─── HANDLER ───
 module.exports = async (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -40,7 +52,8 @@ module.exports = async (req, res) => {
     if (req.method === 'OPTIONS') return res.status(200).end();
 
     try {
-        const { paymentId, email, name, tier } = req.body || {};
+        const body = await getBody(req);
+        const { paymentId, email, name, tier } = body;
         if (!email) return res.status(400).json({ error: "Email is required" });
 
         const isSimulation = paymentId && paymentId.startsWith('pay_test_simulation');

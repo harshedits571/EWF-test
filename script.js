@@ -38,7 +38,7 @@ function isPastDeadline() {
 }
 
 // ===== PAYMENT GATEWAY CONFIGURATION (Global) =====
-var RZP_KEY_ID = 'rzp_test_SbYRBwt9vpi7Rr';
+var RZP_KEY_ID = 'rzp_test_SaJqg7YMwudKqx';
 var CF_APP_ID = '121259341f82a4cec1053b822723952121';
 var CF_MODE = 'production';
 
@@ -1635,7 +1635,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Close listeners
     document.getElementById('close-modal').addEventListener('click', closeModal);
-    
+
     // 🛠️ Simulation Mode for Local Testing
     document.getElementById('simulate-success-btn')?.addEventListener('click', () => {
         const nameVal = document.getElementById('rzp-name').value.trim();
@@ -1650,7 +1650,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const simId = 'pay_test_simulation_' + Math.random().toString(36).substr(2, 9).toUpperCase();
         console.log('[Simulation] Triggering fake success for:', simId);
-        
+
         const simData = {
             name: nameVal,
             email: emailVal,

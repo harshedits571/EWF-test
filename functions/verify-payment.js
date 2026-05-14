@@ -122,7 +122,7 @@ exports.handler = async (event, context) => {
             }
         }
         else if (method === 'razorpay') {
-            const rzpKeyId = process.env.RAZORPAY_KEY_ID || 'rzp_test_SbYRBwt9vpi7Rr';
+            const rzpKeyId = process.env.RAZORPAY_KEY_ID || 'rzp_test_SaJqg7YMwudKqx';
             const rzpKeySecret = process.env.RAZORPAY_KEY_SECRET;
 
             if (!rzpKeySecret) {
@@ -181,11 +181,11 @@ exports.handler = async (event, context) => {
             return {
                 statusCode: 200,
                 headers,
-                body: JSON.stringify({ 
-                    verified: true, 
+                body: JSON.stringify({
+                    verified: true,
                     amount: amountPaid,
                     tier: tier,
-                    message: "Payment confirmed by server. Email dispatched." 
+                    message: "Payment confirmed by server. Email dispatched."
                 })
             };
         } else {

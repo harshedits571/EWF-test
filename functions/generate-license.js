@@ -124,7 +124,7 @@ function initFirebase() {
             console.warn("⚠️ Firebase Service Account Key missing. Using default.");
             admin.initializeApp({ projectId: 'easy-workflow-pro' });
         }
-        
+
         db = admin.firestore();
     } catch (err) {
         console.error("❌ Firebase Critical Init Error:", err.message);
@@ -199,7 +199,7 @@ async function verifyPaymentWithGateway(paymentId, method) {
         return { verified: false, reason: 'Cashfree verification failed' };
 
     } else if (method === 'razorpay') {
-        const rzpKeyId = process.env.RAZORPAY_KEY_ID || 'rzp_test_SbYRBwt9vpi7Rr';
+        const rzpKeyId = process.env.RAZORPAY_KEY_ID || 'rzp_test_SaJqg7YMwudKqx';
         const rzpKeySecret = process.env.RAZORPAY_KEY_SECRET;
 
         if (!rzpKeySecret) {
@@ -209,7 +209,7 @@ async function verifyPaymentWithGateway(paymentId, method) {
 
         try {
             const auth = Buffer.from(`${rzpKeyId}:${rzpKeySecret}`).toString('base64');
-            
+
             // 1. Get current status
             const res = await axios.get(`https://api.razorpay.com/v1/payments/${paymentId}`, {
                 headers: { 'Authorization': `Basic ${auth}` }
@@ -223,15 +223,15 @@ async function verifyPaymentWithGateway(paymentId, method) {
                 try {
                     const captureRes = await axios.post(
                         `https://api.razorpay.com/v1/payments/${paymentId}/capture`,
-                        { 
-                            amount: payment.amount, 
-                            currency: payment.currency 
+                        {
+                            amount: payment.amount,
+                            currency: payment.currency
                         },
                         { headers: { 'Authorization': `Basic ${auth}` } }
                     );
-                    
+
                     console.log(`[Razorpay] Capture Response for ${paymentId}:`, captureRes.data.status);
-                    
+
                     if (captureRes.data && captureRes.data.status === 'captured') {
                         return { verified: true, amount: `${payment.currency} ${payment.amount / 100}` };
                     }
@@ -272,7 +272,7 @@ exports.handler = async (event) => {
     try {
         // ── Simulation Mode Check ──
         const isSimulation = event.body && event.body.includes('pay_test_simulation');
-        
+
         if (!isSimulation) {
             initFirebase();
             if (initError || !db) {
@@ -399,7 +399,7 @@ exports.handler = async (event) => {
         const production = process.env.NODE_ENV === 'production' || process.env.CONTEXT === 'production';
         return {
             statusCode: 500, headers,
-            body: JSON.stringify({ 
+            body: JSON.stringify({
                 error: 'Internal server error.',
                 details: error.message,
                 stack: production ? undefined : error.stack

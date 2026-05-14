@@ -1,6 +1,18 @@
 const axios = require('axios');
 require('dotenv').config();
 
+// HELPER: Parse JSON Body
+async function getBody(req) {
+    return new Promise((resolve) => {
+        let body = '';
+        req.on('data', chunk => { body += chunk.toString(); });
+        req.on('end', () => {
+            try { resolve(JSON.parse(body)); }
+            catch (e) { resolve({}); }
+        });
+    });
+}
+
 module.exports = async (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -8,7 +20,8 @@ module.exports = async (req, res) => {
     if (req.method === 'OPTIONS') return res.status(200).end();
 
     try {
-        const { paymentId, method, tier } = req.body || {};
+        const body = await getBody(req);
+        const { paymentId, method, tier } = body;
         let isVerified = false;
         let amountPaid = "0.00";
 
