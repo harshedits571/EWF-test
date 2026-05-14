@@ -14,6 +14,11 @@ app.use(cors());
 // Serve static files from the current directory (root)
 app.use(express.static('.'));
 
+// Root route to serve index.html (Fixes "Cannot GET /" on Vercel)
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
 // ─── FIREBASE INITIALIZATION ───
 let db = null;
 function initFirebase() {
