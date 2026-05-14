@@ -44,20 +44,46 @@ function signKey(licenseKey, email) {
     return crypto.createHmac('sha256', secret).update(`${licenseKey}:${email.toLowerCase().trim()}`).digest('hex');
 }
 
+// ─── HELPER: Parse JSON Body ───
+async function getBody(req) {
+    return new Promise((resolve) => {
+        let body = '';
+        req.on('data', chunk => { body += chunk.toString(); });
+        req.on('end', () => {
+            try { resolve(JSON.parse(body)); }
+            catch (e) { resolve({}); }
+        });
+    });
+}
+
 // ─── MAIN HANDLER ───
 module.exports = async (req, res) => {
-    // Handle CORS
+    // 1. Setup Response Helpers (Vercel provides these, but Netlify might not)
+    if (!res.status) res.status = (code) => { res.statusCode = code; return res; };
+    if (!res.json) res.json = (data) => {
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify(data));
+    };
+
+    // 2. Handle CORS
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     if (req.method === 'OPTIONS') return res.status(200).end();
 
-    const path = req.url.split('?')[0].replace('/api/', '');
+    // 3. Detect Route
+    const fullUrl = req.url || '';
+    const cleanPath = fullUrl.split('?')[0];
+    
+    // Support both /api/verify and /verify (Netlify vs Vercel)
+    const isRoute = (target) => cleanPath.endsWith(target);
 
     try {
-        // 1. Create Order
-        if (path === 'create-order' && req.method === 'POST') {
-            const { currency, name, email, phone, amount } = req.body;
+        const body = req.method === 'POST' ? await getBody(req) : {};
+
+        // ─── ROUTE: Create Order ───
+        if (isRoute('create-order') && req.method === 'POST') {
+            const { currency, name, email, phone, amount } = body;
             const BASE_URL = process.env.NODE_ENV === 'production' ? "https://api.cashfree.com/pg/orders" : "https://sandbox.cashfree.com/pg/orders";
             
             const response = await axios.post(BASE_URL, {
@@ -76,9 +102,9 @@ module.exports = async (req, res) => {
             return res.json({ payment_session_id: response.data.payment_session_id });
         }
 
-        // 2. Verify Payment
-        if (path === 'verify-payment' && req.method === 'POST') {
-            const { paymentId, method, tier } = req.body;
+        // ─── ROUTE: Verify Payment ───
+        if (isRoute('verify-payment') && req.method === 'POST') {
+            const { paymentId, method, tier } = body;
             let isVerified = false;
             let amountPaid = "0.00";
 
@@ -101,14 +127,14 @@ module.exports = async (req, res) => {
                     amountPaid = `${cfRes.data.payment_currency} ${cfRes.data.payment_amount}`;
                 }
             } else {
-                isVerified = true; // Manual/Razorpay check
+                isVerified = true; // Fallback for manual/client success
             }
             return res.json({ verified: isVerified, amount: amountPaid, tier: tier });
         }
 
-        // 3. Generate License
-        if (path === 'generate-license' && req.method === 'POST') {
-            const { paymentId, email, name, tier } = req.body;
+        // ─── ROUTE: Generate License ───
+        if (isRoute('generate-license') && req.method === 'POST') {
+            const { paymentId, email, name, tier } = body;
             if (!email) return res.status(400).json({ error: "Email is required" });
 
             const isSimulation = paymentId && paymentId.startsWith('pay_test_simulation');
@@ -151,7 +177,7 @@ module.exports = async (req, res) => {
             return res.json({ success: true, licenseKey, email });
         }
 
-        return res.status(404).json({ error: "API Route Not Found: " + path });
+        return res.status(404).json({ error: "Route not found", path: cleanPath });
     } catch (err) {
         console.error("API Error:", err.message);
         return res.status(500).json({ error: err.message });
